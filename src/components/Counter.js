@@ -1,26 +1,27 @@
 import { useSelector, useDispatch } from "react-redux";
+import { counterActions } from "../store/counter";
 import classes from "./Counter.module.css";
 
 const Counter = () => {
 	const dispatch = useDispatch(); // we don't give any argument in useDispatch but it gives as dispatch function.
-	const counter = useSelector((state) => state.counter);
-	const show = useSelector((state) => state.showCounter);
+	const counter = useSelector((state) => state.counter.counter);
+	const show = useSelector((state) => state.counter.showCounter);
 	//useSelector - also update the page when value is change just like useState. and it also unsubscribe when component is not anymore used.
 
 	const incrementHandler = () => {
-		dispatch({ type: "increment" });
+		dispatch(counterActions.increment());
 	};
 
 	const increaseHandler = () => {
-		dispatch({ type: "increase", amount: 10 });
+		dispatch(counterActions.increase(10)); // { type: SOME_UNIQUE_IDENTIFIER, payload: 10 }
 	};
 
 	const decrementHandler = () => {
-		dispatch({ type: "decrement" });
+		dispatch(counterActions.decrement());
 	};
 
 	const toggleCounterHandler = () => {
-		dispatch({ type: "toggle" });
+		dispatch(counterActions.toggleCounter());
 	};
 
 	return (
