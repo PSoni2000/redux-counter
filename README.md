@@ -1,70 +1,183 @@
-# Getting Started with Create React App
+## Notes
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Redux
 
-## Available Scripts
+1. to use Redux in react install **redux & react-redux** npm modules
+2. create "store" folder & js file which will be our central store.
+3. create redux store by -
+   `const store = createStore(counterReducer);`
+4. create reduce function for our redux store -
+   router function uses two arguments state & action
+   where -
+   **state** - previous state
+   **action** - tell us what action we have to perform (action.type) and can also contain some extra data.
 
-In the project directory, you can run:
+   ```
+   const initialState = { counter: 0, showCounter: true };
 
-### `npm start`
+   const counterReducer = (state = initialState, action) => {
+   if (action.type === 'increment') {
+       return {
+       counter: state.counter + 1,
+       };
+   }
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   if (action.type === 'increase') {
+       return {
+       counter: state.counter + action.amount,
+       };
+   }
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+   return state;
+   };
+   ```
 
-### `npm test`
+   full file -
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```
+   import { createStore } from 'redux';
 
-### `npm run build`
+    const initialState = { counter: 0 };
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    const counterReducer = (state = initialState, action) => {
+    if (action.type === 'increment') {
+        return {
+        counter: state.counter + 1,
+        };
+    }
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    if (action.type === 'increase') {
+        return {
+        counter: state.counter + action.amount,
+        };
+    }
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    return state;
+    };
 
-### `npm run eject`
+    const store = createStore(counterReducer);
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    export default store;
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+5. Add provider wrapper to your root component. (same as react context-api)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   ```
+   import React from 'react';
+   import ReactDOM from 'react-dom/client';
+   import { Provider } from 'react-redux';
 
-## Learn More
+   import './index.css';
+   import App from './App';
+   import store from './store/index';
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   const root = ReactDOM.createRoot(document.getElementById('root'));
+   root.render(
+        <Provider store={store}>
+            <App />
+        </Provider>
+   );
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```
 
-### Code Splitting
+6. To get the store value in any component use react-redux.useSelector hook.
+   `const counter = useSelector((state) => state.counter);`
+   **useSelector** - also update the page when value is change just like useState. and it also unsubscribe when component is not anymore used.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+7. To update store value we have to call dispatch function -
+   `const dispatch = useDispatch();`
+   we don't give any argument in useDispatch but it gives as dispatch function which we can use to update redux store values.
 
-### Analyzing the Bundle Size
+   ```
+   import { useSelector, useDispatch } from "react-redux";
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+   import classes from "./Counter.module.css";
 
-### Making a Progressive Web App
+   const Counter = () => {
+       const dispatch = useDispatch();
+       const counter = useSelector((state) => state.counter);
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+       const incrementHandler = () => {
+           dispatch({ type: "increment" });
+       };
 
-### Advanced Configuration
+       const increaseHandler = () => {
+           dispatch({ type: "increase", amount: 10 });
+       };
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+       return (
+           <main>
+               <h1>Redux Counter : {counter}</h1>
+               <div>
+                   <button onClick={incrementHandler}>Increment</button>
+                   <button onClick={increaseHandler}>Increase by 10</button>
+               </div>
+           </main>
+       );
+   };
 
-### Deployment
+   export default Counter;
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Class based Component Redux
 
-### `npm run build` fails to minify
+In class based component we cannot use hooks so we have to connect our component with our state this way
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. import connect function from "react-redux"
+2. connect component with redux store in export
+   `export default connect(mapStateToProps, mapDispatchToProps)(Counter);`
+   here -
+   **mapStateToProps** - provide redux store state in component props
+   **mapDispatchToProps** - provide dispatch function in component props
+
+   ```
+   const mapStateToProps = state => {
+       return {
+           counter: state.counter
+       };
+   }
+
+   const mapDispatchToProps = dispatch => {
+       return {
+           increment: () => dispatch({ type: 'increment' }),
+       }
+   };
+   ```
+
+   **full code -**
+
+   ```
+   import { Component } from "react";
+   import { connect } from "react-redux";
+
+   class Counter extends Component {
+
+   incrementHandler() {
+       this.props.increment();
+   }
+
+   render() {
+       return (
+       <main className={classes.counter}>
+           <h1>Redux Counter : {this.props.counter}</h1>
+           <button onClick={this.incrementHandler.bind(this)}>Increment</button>
+       </main>
+       );
+   }
+   }
+
+   const mapStateToProps = state => {
+       return {
+           counter: state.counter
+       };
+   }
+
+   const mapDispatchToProps = dispatch => {
+       return {
+           increment: () => dispatch({ type: 'increment' }),
+       }
+   };
+
+   export default connect(mapStateToProps, mapDispatchToProps)(Counter);
+   ```
