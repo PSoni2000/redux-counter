@@ -1,6 +1,10 @@
+## Live App Link
+
+[Redux Counter](https://PSoni2000.github.io/redux-counter")
+
 ## Notes
 
-### Redux
+### 1. Redux
 
 1. to use Redux in react install **redux & react-redux** npm modules
 2. create "store" folder & js file which will be our central store.
@@ -120,7 +124,7 @@
    export default Counter;
    ```
 
-### Class based Component Redux
+### 2. Class based Component Redux
 
 In class based component we cannot use hooks so we have to connect our component with our state this way
 
@@ -181,3 +185,110 @@ In class based component we cannot use hooks so we have to connect our component
 
    export default connect(mapStateToProps, mapDispatchToProps)(Counter);
    ```
+
+### 3. Redux toolkit
+
+1. Create stateSlice -
+
+   ```
+   import { createSlice } from "@reduxjs/toolkit";
+   const initialCounterState = { counter: 0, showCounter: true };
+
+   const counterSlice = createSlice({
+       name: "counter",
+       initialState: initialCounterState,
+       reducers: {
+           increment(state) {
+               state.counter++;
+           },
+           increase(state, action) {
+               state.counter = state.counter + action.payload;
+           },
+           toggleCounter(state) {
+               state.showCounter = !state.showCounter;
+           },
+       },
+   });
+
+   export const counterActions = counterSlice.actions;
+
+   export default counterSlice.reducer;
+   ```
+
+   Here in Redux-Toolkit we don't have to care about other state. redux-toolkit will compare old state and new state and according to it return new state.
+
+2. create store from stateSlice -
+
+   ```
+   import { configureStore } from "@reduxjs/toolkit";
+
+   const store = configureStore({
+       reducer: { counter: counterReducer, auth: authReducer },
+   });
+
+   export default store;
+   ```
+
+3. provide store to root component -
+
+   ```
+   import store from './store/index';
+
+   <Provider store={store}>
+       <App />
+   </Provider>
+   ```
+
+4. to get store value -
+
+   ```
+   import { useSelector } from 'react-redux';
+
+   const counter = useSelector((state) => state.counter.counter);
+
+   return (
+          <main>
+              <h1>Redux Counter : {counter}</h1>
+          </main>
+      );
+   ```
+
+5. to update store value -
+
+```
+import { useSelector, useDispatch } from "react-redux";
+import { counterActions } from "../store/counter";
+
+const Counter = () => {
+
+    const dispatch = useDispatch();
+	const counter = useSelector((state) => state.counter.counter);
+	const show = useSelector((state) => state.counter.showCounter);
+
+	const incrementHandler = () => {
+		dispatch(counterActions.increment());
+	};
+
+	const increaseHandler = () => {
+		dispatch(counterActions.increase(10)); // { type: SOME_UNIQUE_IDENTIFIER, payload: 10 }
+	};
+
+	const toggleCounterHandler = () => {
+		dispatch(counterActions.toggleCounter());
+	};
+
+	return (
+		<main className={classes.counter}>
+			<h1>Redux Counter</h1>
+			{show && <div className={classes.value}>{counter}</div>}
+			<div>
+				<button onClick={incrementHandler}>Increment</button>
+				<button onClick={increaseHandler}>Increase by 10</button>
+			</div>
+			<button onClick={toggleCounterHandler}>Toggle Counter</button>
+		</main>
+	);
+};
+
+export default Counter;
+```
