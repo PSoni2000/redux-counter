@@ -1,6 +1,6 @@
 ## Live App Link
 
-[Redux Counter](https://PSoni2000.github.io/redux-counter")
+[Redux Counter](https://PSoni2000.github.io/redux-counter)
 
 ## Notes
 
